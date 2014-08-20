@@ -5,7 +5,7 @@ Controller description: Basic introspection methods
 */
 
 class JSON_API_Core_Controller {
-  
+
   public function info() {
     global $json_api;
     $php = '';
@@ -35,40 +35,37 @@ class JSON_API_Core_Controller {
       );
     }
   }
-  
+
   public function get_recent_posts() {
     global $json_api;
     $posts = $json_api->introspector->get_posts();
     return $this->posts_result($posts);
   }
-  
+
+  public function get_posts() {
+    global $json_api;
+    $url = parse_url($_SERVER['REQUEST_URI']);
+    $defaults = array(
+      'ignore_sticky_posts' => true
+    );
+    $query = wp_parse_args($url['query']);
+    unset($query['json']);
+    unset($query['post_status']);
+    $query = array_merge($defaults, $query);
+    $posts = $json_api->introspector->get_posts($query);
+    $result = $this->posts_result($posts);
+    $result['query'] = $query;
+    return $result;
+  }
+
   public function get_post() {
     global $json_api, $post;
-    extract($json_api->query->get(array('id', 'slug', 'post_id', 'post_slug')));
-    if ($id || $post_id) {
-      if (!$id) {
-        $id = $post_id;
-      }
-      $posts = $json_api->introspector->get_posts(array(
-        'p' => $id
-      ), true);
-    } else if ($slug || $post_slug) {
-      if (!$slug) {
-        $slug = $post_slug;
-      }
-      $posts = $json_api->introspector->get_posts(array(
-        'name' => $slug
-      ), true);
-    } else {
-      $json_api->error("Include 'id' or 'slug' var in your request.");
-    }
-    if (count($posts) == 1) {
-      $post = $posts[0];
+    $post = $json_api->introspector->get_current_post();
+    if ($post) {
       $previous = get_adjacent_post(false, '', true);
       $next = get_adjacent_post(false, '', false);
-      $post = new JSON_API_Post($post);
       $response = array(
-        'post' => $post
+        'post' => new JSON_API_Post($post)
       );
       if ($previous) {
         $response['previous_url'] = get_permalink($previous->ID);
@@ -76,6 +73,19 @@ class JSON_API_Core_Controller {
       if ($next) {
         $response['next_url'] = get_permalink($next->ID);
       }
+      return $response;
+    } else {
+      $json_api->error("Not found.");
+    }
+  }
+
+  public function get_product() {
+    global $json_api, $post;
+    $post = $json_api->introspector->get_current_post();
+    if ($post) {
+      $response = array(
+        'product' => new JSON_API_Product($post)
+      );
       return $response;
     } else {
       $json_api->error("Not found.");
@@ -102,7 +112,7 @@ class JSON_API_Core_Controller {
     } else {
       $json_api->error("Include 'id' or 'slug' var in your request.");
     }
-    
+
     // Workaround for https://core.trac.wordpress.org/ticket/12647
     if (empty($posts)) {
       $url = $_SERVER['REQUEST_URI'];
@@ -117,7 +127,7 @@ class JSON_API_Core_Controller {
       }
       $posts = $json_api->introspector->get_posts(array('pagename' => $path));
     }
-    
+
     if (count($posts) == 1) {
       if (!empty($children)) {
         $json_api->introspector->attach_child_posts($posts[0]);
@@ -129,7 +139,7 @@ class JSON_API_Core_Controller {
       $json_api->error("Not found.");
     }
   }
-  
+
   public function get_date_posts() {
     global $json_api;
     if ($json_api->query->date) {
@@ -150,7 +160,7 @@ class JSON_API_Core_Controller {
     }
     return $this->posts_result($posts);
   }
-  
+
   public function get_category_posts() {
     global $json_api;
     $category = $json_api->introspector->get_current_category();
@@ -162,7 +172,7 @@ class JSON_API_Core_Controller {
     ));
     return $this->posts_object_result($posts, $category);
   }
-  
+
   public function get_tag_posts() {
     global $json_api;
     $tag = $json_api->introspector->get_current_tag();
@@ -174,7 +184,7 @@ class JSON_API_Core_Controller {
     ));
     return $this->posts_object_result($posts, $tag);
   }
-  
+
   public function get_author_posts() {
     global $json_api;
     $author = $json_api->introspector->get_current_author();
@@ -186,19 +196,15 @@ class JSON_API_Core_Controller {
     ));
     return $this->posts_object_result($posts, $author);
   }
-  
+
   public function get_search_results() {
     global $json_api;
-    if ($json_api->query->search) {
-      $posts = $json_api->introspector->get_posts(array(
-        's' => $json_api->query->search
-      ));
-    } else {
-      $json_api->error("Include 'search' var in your request.");
-    }
+    $posts = $json_api->introspector->get_posts(array(
+      's' => $json_api->query->search
+    ));
     return $this->posts_result($posts);
   }
-  
+
   public function get_date_index() {
     global $json_api;
     $permalinks = $json_api->introspector->get_date_archive_permalinks();
@@ -208,16 +214,23 @@ class JSON_API_Core_Controller {
       'tree' => $tree
     );
   }
-  
+
   public function get_category_index() {
     global $json_api;
-    $categories = $json_api->introspector->get_categories();
+    extract($json_api->query->get(array('taxonomy', 'hide_empty', 'exclude')));
+    $args = array(
+      'orderby' => 'name',
+      'taxonomy'  => $taxonomy,
+      'hide_empty' => $hide_empty,
+      'exclude' => $exclude
+    );
+    $categories = $json_api->introspector->get_categories($args);
     return array(
       'count' => count($categories),
       'categories' => $categories
     );
   }
-  
+
   public function get_tag_index() {
     global $json_api;
     $tags = $json_api->introspector->get_tags();
@@ -226,7 +239,23 @@ class JSON_API_Core_Controller {
       'tags' => $tags
     );
   }
-  
+
+  public function get_terms_index() {
+    global $json_api;
+    extract($json_api->query->get(array('taxonomy', 'hide_empty', 'include', 'exclude')));
+    $args = array(
+      'orderby' => 'name',
+      'hide_empty' => $hide_empty,
+      'include' => $include,
+      'exclude' => $exclude
+    );
+    $terms = $json_api->introspector->get_terms($taxonomy, $args);
+    return array(
+      'count' => count($terms),
+      'tags' => $terms
+    );
+  }
+
   public function get_author_index() {
     global $json_api;
     $authors = $json_api->introspector->get_authors();
@@ -235,14 +264,16 @@ class JSON_API_Core_Controller {
       'authors' => array_values($authors)
     );
   }
-  
+
   public function get_page_index() {
     global $json_api;
     $pages = array();
+    $post_type = $json_api->query->post_type ? $json_api->query->post_type : 'page';
+
     // Thanks to blinder for the fix!
     $numberposts = empty($json_api->query->count) ? -1 : $json_api->query->count;
     $wp_posts = get_posts(array(
-      'post_type' => 'page',
+      'post_type' => $post_type,
       'post_parent' => 0,
       'order' => 'ASC',
       'orderby' => 'menu_order',
@@ -258,7 +289,7 @@ class JSON_API_Core_Controller {
       'pages' => $pages
     );
   }
-  
+
   public function get_nonce() {
     global $json_api;
     extract($json_api->query->get(array('controller', 'method')));
@@ -281,7 +312,7 @@ class JSON_API_Core_Controller {
       $json_api->error("Include 'controller' and 'method' vars in your request.");
     }
   }
-  
+
   protected function get_object_posts($object, $id_var, $slug_var) {
     global $json_api;
     $object_id = "{$type}_id";
@@ -306,7 +337,7 @@ class JSON_API_Core_Controller {
     }
     return $posts;
   }
-  
+
   protected function posts_result($posts) {
     global $wp_query;
     return array(
@@ -316,7 +347,7 @@ class JSON_API_Core_Controller {
       'posts' => $posts
     );
   }
-  
+
   protected function posts_object_result($posts, $object) {
     global $wp_query;
     // Convert something like "JSON_API_Category" into "category"
@@ -328,7 +359,7 @@ class JSON_API_Core_Controller {
       'posts' => $posts
     );
   }
-  
+
 }
 
 ?>

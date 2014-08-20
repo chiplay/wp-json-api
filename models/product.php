@@ -1,9 +1,9 @@
 <?php
 
-class JSON_API_Post {
+class JSON_API_Product {
 
   // Note:
-  //   JSON_API_Post objects must be instantiated within The Loop.
+  //   JSON_API_Product objects must be instantiated within The Loop.
 
   var $id;              // Integer
   var $type;            // String
@@ -27,14 +27,16 @@ class JSON_API_Post {
   var $custom_fields;   // Object (included by using custom_fields query var)
 
   // LBL
-  var $subtitle;        // String
-  var $colors;
-  var $search_terms;
-  var $related_posts;
-  var $styleboard_products;
-  var $nb_links;
+  var $description;        // String
+  var $color;
+  var $related_products;
+  var $related_styleboards;
+  var $link;
+  var $price;
+  var $vendor;
+  var $image;
 
-  function JSON_API_Post($wp_post = null) {
+  function JSON_API_Product($wp_post = null) {
     if (!empty($wp_post)) {
       $this->import_wp_object($wp_post);
     }
@@ -112,9 +114,6 @@ class JSON_API_Post {
       }
     }
 
-    // Update ACF
-    // http://www.advancedcustomfields.com/resources/update_field/
-
     if (isset($wp_values['ID'])) {
       $this->id = wp_update_post($wp_values);
     } else {
@@ -146,28 +145,31 @@ class JSON_API_Post {
     $this->set_value('url', get_permalink($this->id));
     $this->set_value('status', $wp_post->post_status);
     $this->set_value('title', get_the_title($this->id));
-    $this->set_value('title_plain', strip_tags(@$this->title));
-    $this->set_content_value();
-    $this->set_value('excerpt', get_the_excerpt());
+    // $this->set_value('title_plain', strip_tags(@$this->title));
+    // $this->set_content_value();
+    // $this->set_value('excerpt', get_the_excerpt());
     $this->set_value('date', get_the_time($date_format));
     $this->set_value('modified', date($date_format, strtotime($wp_post->post_modified)));
     $this->set_categories_value();
     $this->set_tags_value();
     $this->set_author_value($wp_post->post_author);
-    $this->set_comments_value();
+    // $this->set_comments_value();
     $this->set_attachments_value();
-    $this->set_value('comment_count', (int) $wp_post->comment_count);
-    $this->set_value('comment_status', $wp_post->comment_status);
+    // $this->set_value('comment_count', (int) $wp_post->comment_count);
+    // $this->set_value('comment_status', $wp_post->comment_status);
     $this->set_thumbnail_value();
-    $this->set_custom_fields_value();
+    // $this->set_custom_fields_value();
     $this->set_custom_taxonomies($wp_post->post_type);
     // LBL
-    $this->set_related_posts_value();
-    $this->set_value('subtitle', get_field('subtitle', $this->id));
-    $this->set_colors_value();
-    $this->set_search_terms_value();
-    $this->set_styleboard_products_value();
-    $this->set_nb_links();
+    $this->set_related_products_value();
+    $this->set_related_styleboards_value();
+    $this->set_value('color', get_field('product_color', $this->id));
+    $this->set_value('price', get_field('product_price', $this->id));
+    $this->set_value('link', get_field('product_link', $this->id));
+    $this->set_value('vendor', get_field('product_vendor', $this->id));
+    $this->set_value('image', get_field('product_image', $this->id));
+    $this->set_value('description', get_field('product_description', $this->id));
+
     do_action("json_api_import_wp_post", $this, $wp_post);
   }
 
@@ -334,50 +336,22 @@ class JSON_API_Post {
 
   // LBL
 
-  function set_related_posts_value() {
+  function set_related_styleboards_value() {
     global $json_api;
-    if ($json_api->include_value('related_posts')) {
-      $this->related_posts = $json_api->introspector->get_related_posts($this->id);
+    if ($json_api->include_value('related_styleboards')) {
+      $this->related_styleboards = $json_api->introspector->get_related_styleboards($this->id);
     } else {
-      unset($this->related_posts);
+      unset($this->related_styleboards);
     }
   }
 
-  function set_colors_value() {
+  function set_related_products_value() {
     global $json_api;
-    if ($json_api->include_value('colors')) {
-      $this->colors = $json_api->introspector->get_colors($this->id);
+    if ($json_api->include_value('related_products')) {
+      $this->related_products = $json_api->introspector->get_related_products($this->id);
     } else {
-      unset($this->colors);
+      unset($this->related_products);
     }
-  }
-
-  function set_styleboard_products_value() {
-    global $json_api;
-    if ($json_api->include_value('styleboard_products')) {
-      $this->styleboard_products = $json_api->introspector->get_styleboard_products($this->id);
-    } else {
-      unset($this->styleboard_products);
-    }
-  }
-
-  function set_search_terms_value() {
-    global $json_api;
-    if ($json_api->include_value('search_terms')) {
-      $this->search_terms = $json_api->introspector->get_search_terms($this->id);
-    } else {
-      unset($this->search_terms);
-    }
-  }
-
-  function set_nb_links() {
-    global $json_api;
-    if ($json_api->include_value('nb_links')) {
-      $this->nb_links = $json_api->introspector->get_nb_links($this->id);
-    } else {
-      unset($this->nb_links);
-    }
-
   }
 
 }

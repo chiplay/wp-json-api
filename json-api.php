@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: JSON API
-Plugin URI: http://wordpress.org/extend/plugins/json-api/
+Plugin URI: http://wordpress.org/plugins/json-api/
 Description: A RESTful API for WordPress
-Version: 1.0.7
+Version: 1.1.1
 Author: Dan Phiffer
 Author URI: http://phiffer.org/
 */
@@ -14,11 +14,16 @@ $dir = json_api_dir();
 @include_once "$dir/singletons/introspector.php";
 @include_once "$dir/singletons/response.php";
 @include_once "$dir/models/post.php";
+@include_once "$dir/models/product.php";
 @include_once "$dir/models/comment.php";
 @include_once "$dir/models/category.php";
 @include_once "$dir/models/tag.php";
 @include_once "$dir/models/author.php";
 @include_once "$dir/models/attachment.php";
+@include_once "$dir/models/color.php";
+@include_once "$dir/models/related.php";
+@include_once "$dir/models/boarditem.php";
+@include_once "$dir/models/searchterm.php";
 
 function json_api_init() {
   global $json_api;

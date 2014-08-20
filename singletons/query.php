@@ -1,18 +1,18 @@
 <?php
 
 class JSON_API_Query {
-  
+
   // Default values
   protected $defaults = array(
     'date_format' => 'Y-m-d H:i:s',
     'read_more' => 'Read more'
   );
-  
+
   function __construct() {
     // Register JSON API query vars
     add_filter('query_vars', array(&$this, 'query_vars'));
   }
-  
+
   function get($key) {
     if (is_array($key)) {
       $result = array();
@@ -33,15 +33,15 @@ class JSON_API_Query {
       return null;
     }
   }
-  
+
   function __get($key) {
     return $this->get($key);
   }
-  
+
   function __isset($key) {
     return ($this->get($key) !== null);
   }
-  
+
   function wp_query_var($key) {
     $wp_translation = array(
       'json' =>           'json',
@@ -85,7 +85,7 @@ class JSON_API_Query {
       return null;
     }
   }
-  
+
   function strip_magic_quotes($value) {
     if (get_magic_quotes_gpc()) {
       return stripslashes($value);
@@ -93,12 +93,12 @@ class JSON_API_Query {
       return $value;
     }
   }
-  
+
   function query_vars($wp_vars) {
     $wp_vars[] = 'json';
     return $wp_vars;
   }
-  
+
   function get_controller() {
     $json = $this->get('json');
     if (empty($json)) {
@@ -106,13 +106,13 @@ class JSON_API_Query {
     }
     if (preg_match('/^[a-zA-Z_]+$/', $json)) {
       return $this->get_legacy_controller($json);
-    } else if (preg_match('/^([a-zA-Z_]+)(\/|\.)[a-zA-Z_]+$/', $json, $matches)) {
+    } else if (preg_match('/^([a-zA-Z0-9_]+)(\/|\.)[a-zA-Z0-9_]+$/', $json, $matches)) {
       return $matches[1];
     } else {
       return 'core';
     }
   }
-  
+
   function get_legacy_controller($json) {
     global $json_api;
     if ($json == 'submit_comment') {
@@ -131,11 +131,11 @@ class JSON_API_Query {
       return 'core';
     }
   }
-  
+
   function get_method($controller) {
-    
+
     global $json_api;
-    
+
     // Returns an appropriate API method name or false. Four possible outcomes:
     //   1. API isn't being invoked at all (return false)
     //   2. A specific API method was requested (return method name)
@@ -148,14 +148,14 @@ class JSON_API_Query {
     //     * http://example.org/2009/11/10/hello-world/?json=1 (get_post)
     //     * http://example.org/2009/11/?json=1 (get_date_posts)
     //     * http://example.org/category/foo?json=1 (get_category_posts)
-    
+
     $method = $this->get('json');
     if (strpos($method, '/') !== false) {
       $method = substr($method, strpos($method, '/') + 1);
     } else if (strpos($method, '.') !== false) {
       $method = substr($method, strpos($method, '.') + 1);
     }
-    
+
     if (empty($method)) {
       // Case 1: we're not being invoked (done!)
       return false;
@@ -190,5 +190,5 @@ class JSON_API_Query {
     // Case 4: either the method doesn't exist or we don't support the page implicitly
     return 'error';
   }
-  
+
 }
