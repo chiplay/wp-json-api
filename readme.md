@@ -1,10 +1,10 @@
 # JSON API #
-Contributors: dphiffer
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DH4MEG99JR2WE
-Tags: json, api, ajax, cms, admin, integration, moma
-Requires at least: 2.8
-Tested up to: 3.5.2
-Stable tag: 1.1.1
+Contributors: dphiffer  
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=DH4MEG99JR2WE  
+Tags: json, api, ajax, cms, admin, integration, moma  
+Requires at least: 2.8  
+Tested up to: 3.5.2  
+Stable tag: 1.1.1  
 
 A RESTful API for WordPress
 
@@ -31,33 +31,33 @@ See the [Other Notes](http://wordpress.org/extend/plugins/json-api/other_notes/)
 
 ## Documentation ##
 
-1. [General concepts](#1.-General-Concepts)
-   1.1. [Requests](#1.1.-Requests)
-   1.2. [Controllers](#1.2.-Controllers)
-   1.3. [Responses](#1.3.-Responses)
-2. [Request methods](#2.-Request-methods)
-   2.1. [Core controller methods](#2.1.-Core-controller-methods)
-   2.2. [Posts controller methods](#2.2.-Pages-controller-methods)
-   2.3. [Respond controller methods](#2.3.-Respond-controller-methods)
-   2.4. [Widgets controller methods](#2.4.-Widgets-controller-methods)
-3. [Request arguments](#3.-Request-arguments)
-   3.1. [Output-modifying arguments](#3.1.-Output-modifying-arguments)
-   3.2. [Content-modifying arguments](#3.2.-Content-modifying-arguments)
-   3.3. [Using include/exclude and redirects](#3.3.-Using-include/exclude-and-redirects)
-4. [Response objects](#4.-Response-objects)
-   4.1. [Post response object](#4.1.-Post-response-object)
-   4.2. [Category response object](#4.2.-Category-response-object)
-   4.3. [Tag response object](#4.3.-Tag-response-object)
-   4.4. [Author response object](#4.4.-Author-response-object)
-   4.5. [Comment response object](#4.5.-Comment-response-object)
-   4.6. [Attachment response object](#4.6.-Attachment-response-object)
-5. [Extending JSON API](#5.-Extending-JSON-API)
-   5.1. [Plugin hooks](#5.1.-Plugin-hooks)
-   5.2. [Developing JSON API controllers](#5.2.-Developing-JSON-API-controllers)
-   5.3. [Configuration options](#5.3.-Configuration-options)
-6. [Unit tests](#6.-Unit-tests)
-   6.1. [Preparing a WordPress test site](#6.1.-Preparing-a-WordPress-test-site)
-   6.2. [Running the tests](#6.2.-Running-the-tests)
+1. [General concepts](#1.-General-Concepts)  
+   1.1. [Requests](#1.1.-Requests)  
+   1.2. [Controllers](#1.2.-Controllers)  
+   1.3. [Responses](#1.3.-Responses)  
+2. [Request methods](#2.-Request-methods)  
+   2.1. [Core controller methods](#2.1.-Core-controller-methods)  
+   2.2. [Posts controller methods](#2.2.-Pages-controller-methods)  
+   2.3. [Respond controller methods](#2.3.-Respond-controller-methods)  
+   2.4. [Widgets controller methods](#2.4.-Widgets-controller-methods)  
+3. [Request arguments](#3.-Request-arguments)  
+   3.1. [Output-modifying arguments](#3.1.-Output-modifying-arguments)  
+   3.2. [Content-modifying arguments](#3.2.-Content-modifying-arguments)  
+   3.3. [Using include/exclude and redirects](#3.3.-Using-include/exclude-and-redirects)  
+4. [Response objects](#4.-Response-objects)  
+   4.1. [Post response object](#4.1.-Post-response-object)  
+   4.2. [Category response object](#4.2.-Category-response-object)  
+   4.3. [Tag response object](#4.3.-Tag-response-object)  
+   4.4. [Author response object](#4.4.-Author-response-object)  
+   4.5. [Comment response object](#4.5.-Comment-response-object)  
+   4.6. [Attachment response object](#4.6.-Attachment-response-object)  
+5. [Extending JSON API](#5.-Extending-JSON-API)  
+   5.1. [Plugin hooks](#5.1.-Plugin-hooks)  
+   5.2. [Developing JSON API controllers](#5.2.-Developing-JSON-API-controllers)  
+   5.3. [Configuration options](#5.3.-Configuration-options)  
+6. [Unit tests](#6.-Unit-tests)  
+   6.1. [Preparing a WordPress test site](#6.1.-Preparing-a-WordPress-test-site)  
+   6.2. [Running the tests](#6.2.-Running-the-tests)  
 
 ## 1. General Concepts ##
 
@@ -91,7 +91,7 @@ JSON API operates in two modes:
 * `http://www.example.org/api/get_post/?post_id=47`
 * `http://www.example.org/api/get_tag_posts/?tag_slug=banana`
 
-__Further reading__
+__Further reading__  
 See *Section 3: Request arguments* for more information about request arguments to modify the response.
 
 ## 1.2. Controllers ##
@@ -113,7 +113,7 @@ There are a few ways of specifying a controller, depending on how you are callin
 * `http://www.example.org/api/core/get_category_posts/` (`core` controller can also be explicitly specified)
 * `http://www.example.org/?json=respond.submit_comment` (`respond` controller, `submit_comment` method)
 
-__Legacy compatibility__
+__Legacy compatibility__  
 JSON API retains support for its pre-1.0 methods. For example, if you invoke the method `create_post` without a controller specified, the Posts controller is chosen instead of Core.
 
 ### Available controllers ###
@@ -121,7 +121,7 @@ JSON API retains support for its pre-1.0 methods. For example, if you invoke the
 
 The current release includes three controllers: Core, Posts, and Respond. Developers are encouraged to suggest or submit additional controllers.
 
-__Further reading__
+__Further reading__  
 See *Section 2: Request methods* for a complete reference of available controllers and methods. For documentation on extending JSON API with new controllers see *Section 5.2: Developing JSON API controllers*.
 
 ## 1.3. Responses ##
@@ -261,7 +261,7 @@ Returns posts according to WordPress's [`WP_Query` parameters](http://codex.word
 * `page` - return a specific page number from the results
 * `post_type` - used to retrieve custom post types
 
-__Further reading__
+__Further reading__  
 See the [`WP_Query` documentation](http://codex.wordpress.org/Class_Reference/WP_Query#Parameters) for a full list of supported parameters. The `post_status` parameter is currently ignored.
 
 ### Response ###
@@ -616,7 +616,7 @@ Returns a WordPress nonce value, required to call some data manipulation methods
       "nonce": "cefe01efd4"
     }
 
-__Further reading__
+__Further reading__  
 To learn more about how nonces are used in WordPress, see [Mark Jaquith's article on the subject](http://markjaquith.wordpress.com/2006/06/02/wordpress-203-nonces/).
 
 ## 2.2. Pages controller methods ##
@@ -776,10 +776,10 @@ These arguments are available to modify all introspection methods:
 
 ## 3.3. Using include/exclude and redirects ##
 
-__About `include`/`exclude` arguments__
+__About `include`/`exclude` arguments__  
 By default you get all values included with each post object. Specify a list of `include` values will cause the post object to filter out the values absent from the list. Specifying `exclude` causes post objects to include all values except the fields you list. For example, the query `exclude=comments` includes everything *except* the comments.
 
-__About the `redirect` argument__
+__About the `redirect` argument__  
 The `redirect` response style is useful for when you need the user's browser to make a request directly rather than making proxy requests using a tool like cURL. Setting a `redirect` argument causes the user's browser to redirect back to the specified URL instead of returning a JSON object. The resulting `status` value is included as an extra query variable.
 
 For example calling an API method with `redirect` set to `http://www.example.com/foo` will result in a redirection to one of the following:
@@ -794,10 +794,10 @@ You can also set separate URLs to handle status values differently. You could se
 
 This section describes data objects you can retrieve from WordPress and the optional URL redirects.
 
-__Status values__
+__Status values__  
 All JSON API requests result in a status value. The two basic status values are `ok` and `error`. Additional status values are available for certain methods (such as `pending` in the case of the `submit_comment` method). API methods that result in custom status values include a *custom status values* section in their documentation.
 
-__Naming compatibility__
+__Naming compatibility__  
 Developers familiar with WordPress may notice that many names for properties and arguments have been changed. This was a stylistic choice that intends to provide more clarity and consistency in the interface.
 
 ## 4.1. Post response object ##
@@ -823,7 +823,7 @@ Developers familiar with WordPress may notice that many names for properties and
 * `custom_fields` - Object (included by setting the `custom_fields` argument to a comma-separated list of custom field names)
 * `taxonomy_(taxonomy)` - Array of custom taxonomy objects (these resemble Category or Tag response objects, depending on whether the taxonomy is hierarchical)
 
-__Note__
+__Note__  
 The `thumbnail` attribute returns a URL to the image size specified by the optional `thumbnail_size` request argument. By default this will use the `thumbnail` or `post-thumbnail` sizes, depending on your version of WordPress. See [Mark Jaquith's post on the topic](http://markjaquith.wordpress.com/2009/12/23/new-in-wordpress-2-9-post-thumbnail-images/) for more information.
 
 ## 4.2. Category response object ##
@@ -908,7 +908,7 @@ This filter controls the array of controllers available to JSON API. The callbac
 
 Specifies the PHP source file for a given controller, overriding the default location `wp-content/plugins/json_api/controllers`.
 
-__Note__
+__Note__  
 If you your controller file in the `json-api/controllers` folder JSON API will find it automatically.
 
 ### Example ###
@@ -921,7 +921,7 @@ If you your controller file in the `json-api/controllers` folder JSON API will f
       return '/path/to/widgets.php';
     }
 
-__Capitalization__
+__Capitalization__  
 Your filter hook must be all-lowercase to work correctly. The above example would fail with the filter `json_api_Widgets_Controller_path`, even if that's how the class is capitalized in the PHP source.
 
 ## Filter: json_api_encode ##
